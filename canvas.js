@@ -6,7 +6,7 @@ function draw(){
 
 
 $(document).ready(function() {
-	var yoffset = document.getElementById('Shape Selector').offsetHeight + document.getElementById('Shape Action').offsetHeight;
+	var yoffset = document.getElementById('shape_selector').offsetHeight + document.getElementById('shape_action').offsetHeight;
 	var lineFinishX, lineFinishY, lineStartX, lineStartY;
 
 
