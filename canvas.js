@@ -5,6 +5,9 @@ function draw(){
 function selector(cur_select, button_descriptions){
 	console.log("current action is " + cur_select);
 	document.getElementById("current_action").innerHTML=button_descriptions[cur_select];
+	if (cur_select == "clear"){
+		erase_canvas();
+	}
 }
 
 function draw_line(lineStartX, lineFinishX, lineStartY, lineFinishY){
@@ -15,9 +18,15 @@ function draw_line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 		ctx.stroke();
 }
 
+function erase_canvas(){
+	if (confirm ('Are you sure you want to erase all objects on the canvas?')){
+		$('#myCanvas')[0].width = $('#myCanvas')[0].width;
+	}
+}
+
 $(document).ready(function() {
 
-	var button_descriptions = {
+	var button_descriptions = { // Could maybe move this to CSS and then call that ways
 		"line" : "Line tool: Click on a starting point and drag to ending point",
 		"triangle" : "insert instructions",
 		"square" : "Click on top left corner of your desired square and then drag to bottom right corner",
@@ -51,7 +60,7 @@ $(document).ready(function() {
 		if(cur_select == 'line'){
 			draw_line(lineStartX, lineFinishX, lineStartY, lineFinishY);
 		}
-		else {
+		else { 
 			console.log("not line action");
 		}
 		//ctx.beginPath();
