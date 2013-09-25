@@ -6,13 +6,14 @@ function draw(){
 
 
 $(document).ready(function() {
+	var yoffset = document.getElementById('Shape Selector').offsetHeight + document.getElementById('Shape Action').offsetHeight;
 	var lineFinishX, lineFinishY, lineStartX, lineStartY;
 
 
 	// User clicks mouse down to denote where to star their shape
 	$('#myCanvas').mousedown(function(e) {
 		lineStartX = e.clientX;
-		lineStartY = e.clientY;
+		lineStartY = e.clientY - yoffset;
 
 		console.log("This is the start x: " + lineStartX);
 		console.log("This is the start y: " + lineStartY);
@@ -22,7 +23,7 @@ $(document).ready(function() {
 	$('#myCanvas').mouseup(function(e){
 		var ctx = $('#myCanvas')[0].getContext('2d');
 		lineFinishX = e.clientX;
-		lineFinishY = e.clientY;
+		lineFinishY = e.clientY - yoffset;
 
 		ctx.beginPath();
 		ctx.moveTo(lineStartX, lineStartY);

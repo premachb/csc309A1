@@ -5,12 +5,25 @@
   		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   		<script src='canvas.js'></script>
    </head>
-   <div id="header">
-   	   	<button id="circle">Circle</button>
-   	   	<button id="line">Line</button>
-   	   	<button id="rectangle">Rectangle</button>
-   	   	<button id="clear">Clear</button>
+   <div id="Shape Selector">
+        Available Shapes to Draw
+        <div id="shapebuttons">
+          <button id="line">Line</button>
+   	   	  <button id="triangle">Triangle</button>
+   	   	  <button id="Square">Square</button>
+       </div>
+        
    	</div>
+    <div id="Shape Action">
+        Actions
+        <button id="erase">Erase</button>
+        <button id="move">Move</button>
+        <button id="resize">Resize</button>
+        <button id="change">Change Attributes</button>
+        <button id="copy">Copy</button>
+        <button id="paste">Paste</button>
+        <button id="clear">Clear Entire Window</button>
+    </div>
    <body>
 
    		<canvas id='myCanvas' width='500' height='500' style="border:1px solid #000000;"></canvas>
