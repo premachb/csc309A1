@@ -17,15 +17,26 @@ function draw_line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 function draw_triangle(){
 		var ctx = $('#myCanvas')[0].getContext('2d');
 		ctx.beginPath();
-		ctx.moveTo(lineStartX, lineStartY);
-		ctx.lineTo()
+		// This is harder then I thought :S
+}
+
+function draw_square(startX, startY, finishX, finishY){
+	var ctx = $('#myCanvas')[0].getContext('2d');
+	ctx.moveTo(startX, startY);
+	ctx.lineTo(startX, finishY);
+	ctx.lineTo(finishX, startY);
+	ctx.moveTo(finishX, startY);
+	ctx.lineTo(finishX, finishY);
+	ctx.moveTo(finishX, finishY);
+	ctx.moveTo()
+
 
 }
 
 function erase_canvas(){
 	if (confirm ('Are you sure you want to erase all objects on the canvas?')){
 		$('#myCanvas')[0].width = $('#myCanvas')[0].width;
-		$('#current_action').text('Erased Canvas!')
+		$('#current_action').text('Erased Canvas!');
 	}
 }
 
@@ -66,6 +77,9 @@ $(document).ready(function() {
 		lineFinishY = e.clientY - yoffset;
 		if(cur_select == 'line'){
 			draw_line(lineStartX, lineFinishX, lineStartY, lineFinishY);
+		}
+		else if(cur_select == 'square'){
+			draw_square(lineStartX, lineStartY, lineFinishX, lineFinishY);
 		}
 		else { 
 			console.log("not line action");
