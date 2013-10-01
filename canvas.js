@@ -22,14 +22,10 @@ function draw_triangle(){
 
 function draw_square(startX, startY, finishX, finishY){
 	var ctx = $('#myCanvas')[0].getContext('2d');
-	ctx.moveTo(startX, startY);
-	ctx.lineTo(startX, finishY);
-	ctx.lineTo(finishX, startY);
-	ctx.moveTo(finishX, startY);
-	ctx.lineTo(finishX, finishY);
-	ctx.moveTo(finishX, finishY);
-	ctx.moveTo()
+	var height = Math.abs(finishY - startY);
+	var width = Math.abs(finishX - startX);
 
+	ctx.strokeRect(startX, startY, width, height);
 
 }
 
@@ -65,6 +61,11 @@ $(document).ready(function() {
 	// User clicks mouse down to denote where to star their shape
 	$('#myCanvas').mousedown(function(e) {
 		if(cur_select == 'line'){
+			lineStartX = e.clientX;
+			lineStartY = e.clientY - yoffset;
+		}
+
+		else if(cur_select == 'square'){
 			lineStartX = e.clientX;
 			lineStartY = e.clientY - yoffset;
 		}
