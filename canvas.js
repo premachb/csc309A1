@@ -6,7 +6,7 @@ function selector(cur_select, button_descriptions, shapeArray){
 	}
 }
 
-function draw_line(lineStartX, lineFinishX, lineStartY, lineFinishY){
+function draw_line(lineStartX, lineStartY, lineFinishX, lineFinishY){
 	    var ctx = $('#myCanvas')[0].getContext('2d');
 		ctx.beginPath();
 		ctx.moveTo(lineStartX, lineStartY);
@@ -99,6 +99,20 @@ function draw_objects(ctx, shapeArray){
 	}
 }
 
+function draw_temp(ctx, cur_select, lineStartX, lineStartY, curX, curY){
+	if(cur_select=='line'){
+		// draw temp line
+		draw_line(lineStartX, lineStartY, curX, curY);
+	} else if (cur_select=='square'){
+		// draw temp square
+		draw_square(lineStartX, lineStartY, curX, curY);
+	} else {
+		// it is a temp triangle to be drawn
+	}
+
+
+}
+
 function erase_canvas(internal, shapeArray){
 
 	if(internal){
@@ -156,6 +170,7 @@ $(document).ready(function() {
 			// object is being drawn
 			// update the screen
 			draw_objects(ctx, shapeArray);
+			draw_temp(ctx, cur_select, lineStartX, lineStartY, event.pageX, event.pageY - yoffset);
 			//drawTemp();
 		}
 		// used for debugging purposes only - remove this line (eventually)
