@@ -1,8 +1,8 @@
-function selector(cur_select, button_descriptions){
+function selector(cur_select, button_descriptions, shapeArray){
 	console.log("current action is " + cur_select);
 	document.getElementById("current_action").innerHTML=button_descriptions[cur_select];
 	if (cur_select == "clear"){
-		erase_canvas(false);
+		erase_canvas(false, shapeArray);
 	}
 }
 
@@ -73,7 +73,7 @@ function Square(startX, startY, finishX, finishY){
 
 function Line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 	//var ctx = $('#myCanvas')[0].getContext('2d');
-	console.log(lineStartX, lineFinishX, lineStartY, lineFinishY);
+	//console.log(lineStartX, lineFinishX, lineStartY, lineFinishY);
 	this.lineStartX = lineStartX;
 	this.lineStartY = lineStartY;
 	this.lineFinishX = lineFinishX;
@@ -88,19 +88,25 @@ function Line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 		ctx.stroke();
 	}
 }
+
 function draw_objects(ctx, shapeArray){
-	var arrLength = shapeArray.length;
-	for(var index = 0; index < arrLength; index++){
-		shapeArray[index].draw(ctx);
+	erase_canvas(true, shapeArray);
+	if(shapeArray !== 'undefined'){
+		var arrLength = shapeArray.length;
+		for(var index = 0; index < arrLength; index++){
+			shapeArray[index].draw(ctx);
+		}
 	}
 }
 
-function erase_canvas(internal){
+function erase_canvas(internal, shapeArray){
+
 	if(internal){
 		$('#myCanvas')[0].width = $('#myCanvas')[0].width;
 	}
 	else{
 		if (confirm ('Are you sure you want to erase all objects on the canvas?')){
+			shapeArray.length = 0;
 			$('#myCanvas')[0].width = $('#myCanvas')[0].width;
 			$('#current_action').text('Erased Canvas!');
 		}
@@ -110,7 +116,8 @@ function erase_canvas(internal){
 // TODO create a Shape object in which 
 
 $(document).ready(function() {
-
+	var ctx = $('#myCanvas')[0].getContext('2d');
+	var shapeArray = new Array(); // keep track of the objects currently on the canvas.
 	var button_descriptions = { // Could maybe move this to CSS and then call that ways
 		"line" : "Line tool: Click on a starting point and drag to ending point",
 		"triangle" : "insert instructions",
@@ -127,11 +134,11 @@ $(document).ready(function() {
 	var yoffset = document.getElementById('shape_selector').offsetHeight + document.getElementById('shape_action').offsetHeight;
 	var lineFinishX, lineFinishY, lineStartX, lineStartY;
 	var cur_select = "none";
-	var shapes = []; // keep track of the objects currently on the canvas. 
+	 
 	var mDown = false;
 	// User clicks mouse down to denote where to star their shape
 	$('#myCanvas').mousedown(function(e) {
-
+		mDown = true;
 		if(cur_select == 'line'){
 			lineStartX = e.clientX;
 			lineStartY = e.clientY - yoffset;
@@ -145,10 +152,10 @@ $(document).ready(function() {
 
 	//this is where the drawing occurs
 	$(document).mousemove(function(event){
-		if(mDown=true){
+		if(mDown==true){
 			// object is being drawn
 			// update the screen
-			//draw_objects();
+			draw_objects(ctx, shapeArray);
 			//drawTemp();
 		}
 		// used for debugging purposes only - remove this line (eventually)
@@ -156,26 +163,31 @@ $(document).ready(function() {
   	});
 	// User lifts mouse up to denote where to finish their shape
 	$('#myCanvas').mouseup(function(e){
+		mDown=false;
 		var ctx = $('#myCanvas')[0].getContext('2d');
 		lineFinishX = e.clientX;
 		lineFinishY = e.clientY - yoffset;
 		if(cur_select == 'line'){
 			//draw_line(lineStartX, lineFinishX, lineStartY, lineFinishY);
 			var tempLine = new Line(lineStartX, lineFinishX, lineStartY, lineFinishY);
-			tempLine.draw(ctx);
+			shapeArray.push(tempLine);
+			//tempLine.draw(ctx);
 		}
 		else if(cur_select == 'square'){
 			//draw_square(lineStartX, lineStartY, lineFinishX, lineFinishY);
 			var tempSquare = new Square(lineStartX, lineStartY, lineFinishX, lineFinishY);
-			tempSquare.draw(ctx);
+			shapeArray.push(tempSquare);
+			//tempSquare.draw(ctx);
 		}
+
 		else { 
 			console.log("not line action");
 		}
+		draw_objects(ctx, shapeArray);
 	});
 
 
 
-	$("button").click(function(){ cur_select = $(this).attr('id'); selector(cur_select, button_descriptions)});
+	$("button").click(function(){ cur_select = $(this).attr('id'); selector(cur_select, button_descriptions, shapeArray)});
 
 });
