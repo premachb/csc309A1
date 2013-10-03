@@ -30,7 +30,6 @@ function draw_square(startX, startY, finishX, finishY){
 		}else{
 			ctx.strokeRect(startX, finishY, width, height);
 		}
-		//ctx.strokeRect(startX, startY, width, height);
 	} else{
 		if(startY < finishY){
 			ctx.strokeRect(finishX, startY, width, height);
@@ -42,6 +41,36 @@ function draw_square(startX, startY, finishX, finishY){
 	//ctx.strokeRect(startX, startY, width, height);
 
 }
+function Square(startX, startY, finishX, finishY){
+	if(startX < finishX){
+		if(startY < finishY){
+			this.x = startX;
+			this.y = startY;
+			//ctx.strokeRect(startX, startY, width, height);
+		} else{
+			this.x = startX;
+			this.y = finishY;
+			//ctx.strokeRect(startX, finishY, width, height);
+		}
+	} else{
+		if(startY < finishY){
+			this.x = finishX;
+			this.y = startY;
+			//ctx.strokeRect(finishX, startY, width, height);
+		} else{
+			this.x = finishX;
+			this.y = finishY;
+			//ctx.strokeRect(finishX, finishY, width, height);
+		}
+		
+	}
+	this.height = Math.abs(finishY - startY);
+	this.width = Math.abs(finishX - startX);
+	this.draw=function(ctx){
+		ctx.strokeRect(this.x, this.y, this.width, this.height);
+	}
+}
+
 function Line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 	//var ctx = $('#myCanvas')[0].getContext('2d');
 	console.log(lineStartX, lineFinishX, lineStartY, lineFinishY);
@@ -127,15 +156,18 @@ $(document).ready(function() {
   	});
 	// User lifts mouse up to denote where to finish their shape
 	$('#myCanvas').mouseup(function(e){
-		//var ctx = $('#myCanvas')[0].getContext('2d');
+		var ctx = $('#myCanvas')[0].getContext('2d');
 		lineFinishX = e.clientX;
 		lineFinishY = e.clientY - yoffset;
 		if(cur_select == 'line'){
-			draw_line(lineStartX, lineFinishX, lineStartY, lineFinishY);
+			//draw_line(lineStartX, lineFinishX, lineStartY, lineFinishY);
 			var tempLine = new Line(lineStartX, lineFinishX, lineStartY, lineFinishY);
+			tempLine.draw(ctx);
 		}
 		else if(cur_select == 'square'){
-			draw_square(lineStartX, lineStartY, lineFinishX, lineFinishY);
+			//draw_square(lineStartX, lineStartY, lineFinishX, lineFinishY);
+			var tempSquare = new Square(lineStartX, lineStartY, lineFinishX, lineFinishY);
+			tempSquare.draw(ctx);
 		}
 		else { 
 			console.log("not line action");
