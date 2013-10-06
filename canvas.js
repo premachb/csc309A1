@@ -66,9 +66,14 @@ function Square(startX, startY, finishX, finishY){
 	}
 	this.height = Math.abs(finishY - startY);
 	this.width = Math.abs(finishX - startX);
+	this.fillStyle = "#E31230";
+	this.defineFill=function(fillStyle){
+		this.fillStyle = fillStyle;
+	}
 	this.draw=function(ctx){
-		ctx.strokeRect(this.x, this.y, this.width, this.height);
-		ctx.fill();
+		ctx.fillStyle = this.fillStyle;
+		ctx.fillRect(this.x, this.y, this.width, this.height);
+		//ctx.fill();
 	}
 }
 function Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineFinishY){
@@ -78,11 +83,16 @@ function Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineF
 	this.lineMidY = lineMidY;
 	this.lineFinishX = lineFinishX;
 	this.lineFinishY = lineFinishY;
+	this.fillStyle = "#00B2EE";
+	this.defineFill=function(fillStyle){
+		this.fillStlye = fillStyle;
+	}
 	this.updateMid=function(newX, newY){
 		this.lineMidX = newX;
 		this.lineMidY = newY;
 	}
 	this.draw=function(ctx){
+		ctx.fillStyle = this.fillStyle;
 		ctx.beginPath();
 		ctx.moveTo(this.lineStartX, this.lineStartY);
 		ctx.lineTo(this.lineMidX, this.lineMidY);
@@ -178,7 +188,6 @@ $(document).ready(function() {
 	var lineFinishX, lineFinishY, lineStartX, lineStartY, lineMidX, lineMidY;
 	var cur_select = "none";
 	var triangleValidMid = false;
-	var tempTriangle;
 	var mDown = false;
 	// User clicks mouse down to denote where to star their shape
 	$('#myCanvas').mousedown(function(e) {
@@ -240,6 +249,7 @@ $(document).ready(function() {
 			if(triangleValidMid){
 				var tempTriangle = new Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineFinishY);
 				//tempTriangle.updateEnd(lineFinishX, lineFinishY);
+				tempTriangleLine = null;
 				shapeArray.push(tempTriangle);
 				triangleValidMid = false;
 			}else{
