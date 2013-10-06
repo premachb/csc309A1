@@ -21,7 +21,7 @@ function draw_triangle(lineStartX, lineStartY, lineMidX, lineMidY, curX, curY){
 		ctx.lineTo(lineMidX, lineMidY);
 		ctx.lineTo(curX, curY);
 		ctx.closePath();
-		ctx.fill();
+		ctx.stroke();
 }
 
 function draw_square(startX, startY, finishX, finishY){
@@ -66,14 +66,19 @@ function Square(startX, startY, finishX, finishY){
 	}
 	this.height = Math.abs(finishY - startY);
 	this.width = Math.abs(finishX - startX);
+	this.strokeStyle = "#00B2EE";
 	this.fillStyle = "#E31230";
+	this.lineWidth = 1;
 	this.defineFill=function(fillStyle){
 		this.fillStyle = fillStyle;
 	}
 	this.draw=function(ctx){
+		ctx.lineWidth = this.lineWidth;
+		ctx.strokeStyle = this.strokeStyle;
 		ctx.fillStyle = this.fillStyle;
 		ctx.fillRect(this.x, this.y, this.width, this.height);
-		//ctx.fill();
+		ctx.strokeRect(this.x, this.y, this.width, this.height);
+		resetCtx(ctx)
 	}
 }
 function Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineFinishY){
@@ -83,7 +88,9 @@ function Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineF
 	this.lineMidY = lineMidY;
 	this.lineFinishX = lineFinishX;
 	this.lineFinishY = lineFinishY;
+	this.lineWidth = 10;
 	this.fillStyle = "#00B2EE";
+	this.strokeStyle = "#E31230";
 	this.defineFill=function(fillStyle){
 		this.fillStlye = fillStyle;
 	}
@@ -92,6 +99,8 @@ function Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineF
 		this.lineMidY = newY;
 	}
 	this.draw=function(ctx){
+		ctx.lineWidth = this.lineWidth;
+		ctx.strokeStyle = this.strokeStyle;
 		ctx.fillStyle = this.fillStyle;
 		ctx.beginPath();
 		ctx.moveTo(this.lineStartX, this.lineStartY);
@@ -99,9 +108,18 @@ function Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineF
 		ctx.lineTo(this.lineFinishX, this.lineFinishY);
 		ctx.closePath();
 		ctx.fill();
+		ctx.stroke();
+		resetCtx(ctx)
 	}
 
 
+}
+
+function resetCtx(ctx){
+	// set to a default black/black/1 px line
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "000000"
+	ctx.fillStyle = "000000"
 }
 
 function Line(lineStartX, lineFinishX, lineStartY, lineFinishY){
@@ -111,14 +129,20 @@ function Line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 	this.lineStartY = lineStartY;
 	this.lineFinishX = lineFinishX;
 	this.lineFinishY = lineFinishY;
-	this.color;
-	this.fill="#FF0000";
+	this.lineWidth = 1;
+	this.strokeStyle = "#FF0000";
+	this.fillStyle = "#FF0000"
 	this.outline_width;
 	this.draw=function(ctx){
+		ctx.lineWidth = this.lineWidth;
+		ctx.fillStyle = this.fillStyle;
+		ctx.strokeStyle = this.strokeStyle;
 		ctx.beginPath();
 		ctx.moveTo(this.lineStartX, this.lineStartY);
 		ctx.lineTo(this.lineFinishX, this.lineFinishY);
+		ctx.fill();
 		ctx.stroke();
+		resetCtx(ctx)
 	}
 }
 
