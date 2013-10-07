@@ -98,6 +98,10 @@ function Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineF
 		this.strokeStyle = strokeStyle;
 		this.fillStyle = fillStyle;
 	}
+	this.updateMid=function(newX, newY){
+		this.lineMidX = newX;
+		this.lineMidY = newY;
+	}
 	this.draw=function(ctx){
 		ctx.lineWidth = this.lineWidth;
 		ctx.strokeStyle = this.strokeStyle;
@@ -238,8 +242,8 @@ $(document).ready(function() {
 		else if (cur_select == 'triangle'){
 			if (triangleValidMid){
 				//tempTriangle.updateMid(e.clientX, e.clientY - yoffset);
-				//lineMidX = e.clientX;
-				//lineMidY = e.clientY - yoffset;
+				lineMidX = e.clientX;
+				lineMidY = e.clientY - yoffset;
 				triangleValidMid = true;
 			} else{
 				console.log("started triangle");
@@ -295,7 +299,7 @@ $(document).ready(function() {
 				triangleValidMid = false;
 			}else{
 				triangleValidMid = true;
-				tempTriangle.updateMid(lineFinishX, lineFinishY);
+				//tempTriangle.updateMid(lineFinishX, lineFinishY);
 				lineMidX = lineFinishX;
 				lineMidY = lineFinishY;
 			}
