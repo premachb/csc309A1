@@ -69,7 +69,9 @@ function Square(startX, startY, finishX, finishY){
 	this.strokeStyle = "#00B2EE";
 	this.fillStyle = "#E31230";
 	this.lineWidth = 1;
-	this.defineFill=function(fillStyle){
+	this.setStyle=function(strokeStyle, fillStyle, lineWidth){
+		this.lineWidth = lineWidth;
+		this.strokeStyle = strokeStyle;
 		this.fillStyle = fillStyle;
 	}
 	this.draw=function(ctx){
@@ -88,15 +90,13 @@ function Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineF
 	this.lineMidY = lineMidY;
 	this.lineFinishX = lineFinishX;
 	this.lineFinishY = lineFinishY;
-	this.lineWidth = 10;
+	this.lineWidth = 1;
 	this.fillStyle = "#00B2EE";
 	this.strokeStyle = "#E31230";
-	this.defineFill=function(fillStyle){
-		this.fillStlye = fillStyle;
-	}
-	this.updateMid=function(newX, newY){
-		this.lineMidX = newX;
-		this.lineMidY = newY;
+	this.setStyle=function(strokeStyle, fillStyle, lineWidth){
+		this.lineWidth = lineWidth;
+		this.strokeStyle = strokeStyle;
+		this.fillStyle = fillStyle;
 	}
 	this.draw=function(ctx){
 		ctx.lineWidth = this.lineWidth;
@@ -133,6 +133,11 @@ function Line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 	this.strokeStyle = "#FF0000";
 	this.fillStyle = "#FF0000"
 	this.outline_width;
+	this.setStyle=function(strokeStyle, fillStyle, lineWidth){
+		this.lineWidth = lineWidth;
+		this.strokeStyle = strokeStyle;
+		this.fillStyle = fillStyle;
+	}
 	this.draw=function(ctx){
 		ctx.lineWidth = this.lineWidth;
 		ctx.fillStyle = this.fillStyle;
@@ -208,11 +213,17 @@ $(document).ready(function() {
 		"clear" : "Remove all objects off the canvas. THIS ACTION CANNOT BE UNDONE"
 	};
 
-	var yoffset = document.getElementById('shape_selector').offsetHeight + document.getElementById('shape_action').offsetHeight;
+	var yoffset = document.getElementById('shape_selector').offsetHeight + document.getElementById('shape_action').offsetHeight
+																		 + document.getElementById('line-width').offsetHeight
+																		 + document.getElementById('stroke-color').offsetHeight
+																		 + document.getElementById('fill-color').offsetHeight;
 	var lineFinishX, lineFinishY, lineStartX, lineStartY, lineMidX, lineMidY;
 	var cur_select = "none";
-	var triangleValidMid = false;
 	var mDown = false;
+	var fillStyle = document.getElementById('fill-color').value;
+	var strokeStyle = document.getElementById('stroke-color').value;
+	var lineWidth = document.getElementById('line-width').value;
+	var triangleValidMid=false;
 	// User clicks mouse down to denote where to star their shape
 	$('#myCanvas').mousedown(function(e) {
 		mDown = true;
@@ -257,28 +268,34 @@ $(document).ready(function() {
 
 	// User lifts mouse up to denote where to finish their shape
 	$('#myCanvas').mouseup(function(e){
+		fillStyle = document.getElementById('fill-color').value;
+		strokeStyle = document.getElementById('stroke-color').value;
+		lineWidth = document.getElementById('line-width').value;
 		mDown=false;
 		var ctx = $('#myCanvas')[0].getContext('2d');
 		lineFinishX = e.clientX;
 		lineFinishY = e.clientY - yoffset;
+
 		if(cur_select == 'line'){
 			var tempLine = new Line(lineStartX, lineFinishX, lineStartY, lineFinishY);
+			tempLine.setStyle(strokeStyle, fillStyle, lineWidth);
 			shapeArray.push(tempLine);
 		}
 		else if(cur_select == 'square'){
 			var tempSquare = new Square(lineStartX, lineStartY, lineFinishX, lineFinishY);
+			tempSquare.setStyle(strokeStyle, fillStyle, lineWidth);
 			shapeArray.push(tempSquare);
 		}
 		else if (cur_select == 'triangle'){
 			if(triangleValidMid){
 				var tempTriangle = new Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineFinishY);
-				//tempTriangle.updateEnd(lineFinishX, lineFinishY);
+				tempTriangle.setStyle(strokeStyle, fillStyle, lineWidth);
 				tempTriangleLine = null;
 				shapeArray.push(tempTriangle);
 				triangleValidMid = false;
 			}else{
 				triangleValidMid = true;
-				//tempTriangle.updateMid(lineFinishX, lineFinishY);
+				tempTriangle.updateMid(lineFinishX, lineFinishY);
 				lineMidX = lineFinishX;
 				lineMidY = lineFinishY;
 			}
