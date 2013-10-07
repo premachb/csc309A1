@@ -217,10 +217,7 @@ $(document).ready(function() {
 		"clear" : "Remove all objects off the canvas. THIS ACTION CANNOT BE UNDONE"
 	};
 
-	var yoffset = document.getElementById('shape_selector').offsetHeight + document.getElementById('shape_action').offsetHeight
-																		 + document.getElementById('line-width').offsetHeight
-																		 + document.getElementById('stroke-color').offsetHeight
-																		 + document.getElementById('fill-color').offsetHeight;
+	var yoffset = document.getElementById('shape_selector').offsetHeight + document.getElementById('shape_action').offsetHeight;
 	var lineFinishX, lineFinishY, lineStartX, lineStartY, lineMidX, lineMidY;
 	var cur_select = "none";
 	var mDown = false;
