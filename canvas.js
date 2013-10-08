@@ -75,9 +75,12 @@ function Square(startX, startY, finishX, finishY){
 		this.fillStyle = fillStyle;
 	}
 	this.draw=function(ctx){
+
 		ctx.lineWidth = this.lineWidth;
 		ctx.strokeStyle = this.strokeStyle;
 		ctx.fillStyle = this.fillStyle;
+		ctx.beginPath();
+		ctx.rect(this.x, this.y, this.width, this.height);
 		ctx.fillRect(this.x, this.y, this.width, this.height);
 		ctx.strokeRect(this.x, this.y, this.width, this.height);
 		resetCtx(ctx)
@@ -150,17 +153,20 @@ function Line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 		ctx.moveTo(this.lineStartX, this.lineStartY);
 		ctx.lineTo(this.lineFinishX, this.lineFinishY);
 		ctx.fill();
-		ctx.stroke();
+		//ctx.stroke();
 		resetCtx(ctx)
 	}
 }
 
-function draw_objects(ctx, shapeArray){
+function draw_objects(ctx, shapeArray, curX, curY){
 	erase_canvas(true, shapeArray);
 	if(shapeArray !== 'undefined'){
 		var arrLength = shapeArray.length;
 		for(var index = 0; index < arrLength; index++){
 			shapeArray[index].draw(ctx);
+			if(ctx.isPointInPath(curX, curY)){
+				console.log("point on path");
+			}
 		}
 	}
 }
@@ -220,21 +226,23 @@ $(document).ready(function() {
 	var yoffset = document.getElementById('shape_selector').offsetHeight + document.getElementById('shape_action').offsetHeight;
 	var lineFinishX, lineFinishY, lineStartX, lineStartY, lineMidX, lineMidY;
 	var cur_select = "none";
-	var mDown = false;
 	var fillStyle = document.getElementById('fill-color').value;
 	var strokeStyle = document.getElementById('stroke-color').value;
 	var lineWidth = document.getElementById('line-width').value;
 	var triangleValidMid=false;
+	var drawingObject = false;
 	// User clicks mouse down to denote where to star their shape
 	$('#myCanvas').mousedown(function(e) {
-		mDown = true;
+
 		if(cur_select == 'line'){
 			lineStartX = e.clientX;
 			lineStartY = e.clientY - yoffset;
+			drawingObject = true;
 		}
 		else if(cur_select == 'square'){
 			lineStartX = e.clientX;
 			lineStartY = e.clientY - yoffset;
+			drawingObject = true;
 		} 
 		else if (cur_select == 'triangle'){
 			if (triangleValidMid){
@@ -246,25 +254,26 @@ $(document).ready(function() {
 				console.log("started triangle");
 				lineStartX = e.clientX;
 				lineStartY = e.clientY - yoffset;
+				drawingObject = true;
 			}
 		}
 	});
 
 	//this is where the drawing occurs
 	$(document).mousemove(function(event){
-		if(mDown==true){
 			// object is being drawn
 			// update the screen
 			curX = event.clientX;
 			curY = event.clientY - yoffset;
-			draw_objects(ctx, shapeArray);
-			if(triangleValidMid){
-				draw_temp(ctx, cur_select, lineStartX, lineStartY, lineMidX, lineMidY, curX, curY)
-			} else{
-				draw_temp(ctx, cur_select, lineStartX, lineStartY, lineStartX, lineStartY, curX, curY);
+			draw_objects(ctx, shapeArray, curX, curY);
+			if(drawingObject){
+				if(triangleValidMid){
+					draw_temp(ctx, cur_select, lineStartX, lineStartY, lineMidX, lineMidY, curX, curY)
+				} else{
+					draw_temp(ctx, cur_select, lineStartX, lineStartY, lineStartX, lineStartY, curX, curY);
+				}
 			}
-			//draw_temp(ctx, cur_select, lineStartX, lineStartY, event.pageX, event.pageY - yoffset);
-		}
+		
   	});
 
 	// User lifts mouse up to denote where to finish their shape
@@ -272,7 +281,6 @@ $(document).ready(function() {
 		fillStyle = document.getElementById('fill-color').value;
 		strokeStyle = document.getElementById('stroke-color').value;
 		lineWidth = document.getElementById('line-width').value;
-		mDown=false;
 		var ctx = $('#myCanvas')[0].getContext('2d');
 		lineFinishX = e.clientX;
 		lineFinishY = e.clientY - yoffset;
@@ -281,11 +289,13 @@ $(document).ready(function() {
 			var tempLine = new Line(lineStartX, lineFinishX, lineStartY, lineFinishY);
 			tempLine.setStyle(strokeStyle, fillStyle, lineWidth);
 			shapeArray.push(tempLine);
+			drawingObject = false;
 		}
 		else if(cur_select == 'square'){
 			var tempSquare = new Square(lineStartX, lineStartY, lineFinishX, lineFinishY);
 			tempSquare.setStyle(strokeStyle, fillStyle, lineWidth);
 			shapeArray.push(tempSquare);
+			drawingObject = false;
 		}
 		else if (cur_select == 'triangle'){
 			if(triangleValidMid){
@@ -294,9 +304,9 @@ $(document).ready(function() {
 				tempTriangleLine = null;
 				shapeArray.push(tempTriangle);
 				triangleValidMid = false;
+				drawingObject = false;
 			}else{
 				triangleValidMid = true;
-				//tempTriangle.updateMid(lineFinishX, lineFinishY);
 				lineMidX = lineFinishX;
 				lineMidY = lineFinishY;
 			}
@@ -305,7 +315,7 @@ $(document).ready(function() {
 		else { 
 			console.log("not line action");
 		}
-		draw_objects(ctx, shapeArray);
+		draw_objects(ctx, shapeArray, e.clientX, e.clientY - yoffset);
 	});
 
 	$("button").click(function(){ cur_select = $(this).attr('id'); selector(cur_select, button_descriptions, shapeArray)});
