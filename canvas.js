@@ -121,10 +121,13 @@ function Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineF
 
 
 }
+function erase(shapeArray, i, curX, curY){
+	shapeArray.splice(i,1);
+}
 
 function resetCtx(ctx){
 	// set to a default black/black/1 px line
-	ctx.lineWidth = 1;
+	ctx.lineWidth = 3;
 	ctx.strokeStyle = "000000"
 	ctx.fillStyle = "000000"
 }
@@ -152,19 +155,23 @@ function Line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 		ctx.beginPath();
 		ctx.moveTo(this.lineStartX, this.lineStartY);
 		ctx.lineTo(this.lineFinishX, this.lineFinishY);
-		ctx.fill();
-		//ctx.stroke();
+		//ctx.fill();
+		ctx.stroke();
 		resetCtx(ctx)
 	}
 }
 
-function draw_objects(ctx, shapeArray, curX, curY){
+function draw_objects(ctx, cur_select, shapeArray, curX, curY){
 	erase_canvas(true, shapeArray);
 	if(shapeArray !== 'undefined'){
 		var arrLength = shapeArray.length;
 		for(var index = 0; index < arrLength; index++){
 			shapeArray[index].draw(ctx);
 			if(ctx.isPointInPath(curX, curY)){
+				if(cur_select == 'erase'){
+					erase(shapeArray, index, curX, curY);
+					return 1;
+				}
 				console.log("point on path");
 			}
 		}
@@ -265,7 +272,8 @@ $(document).ready(function() {
 			// update the screen
 			curX = event.clientX;
 			curY = event.clientY - yoffset;
-			draw_objects(ctx, shapeArray, curX, curY);
+			while( 1 == draw_objects(ctx, cur_select, shapeArray, curX, curY)){
+			}
 			if(drawingObject){
 				if(triangleValidMid){
 					draw_temp(ctx, cur_select, lineStartX, lineStartY, lineMidX, lineMidY, curX, curY)
@@ -315,7 +323,7 @@ $(document).ready(function() {
 		else { 
 			console.log("not line action");
 		}
-		draw_objects(ctx, shapeArray, e.clientX, e.clientY - yoffset);
+		draw_objects(ctx, cur_select, shapeArray, e.clientX, e.clientY - yoffset);
 	});
 
 	$("button").click(function(){ cur_select = $(this).attr('id'); selector(cur_select, button_descriptions, shapeArray)});
