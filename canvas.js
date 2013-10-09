@@ -45,6 +45,7 @@ function draw_square(startX, startY, finishX, finishY){
 
 }
 function CopyInfo(){
+	this.moving = false;
 	this.squareDelta = [0,0];
 	this.lineDelta = [0,0];
 	this.triangleDelta = [[0,0],[0,0]];
@@ -75,7 +76,7 @@ function CopyInfo(){
 			tSquare.setStyle(this.strokeStyle, this.fillStyle, this.lineWidth);
 			shapeArray.push(tSquare);
 		}else if(this.whichShape == 'line'){
-			var tLine = new Line(x, y, x + lineDelta[0], y + lineDelta[1]);
+			var tLine = new Line(x, y, x + this.lineDelta[0], y + this.lineDelta[1]);
 			tLine.setStyle(this.strokeStyle, this.fillStyle, this.lineWidth);
 			shapeArray.push(tLine);
 
@@ -86,13 +87,25 @@ function CopyInfo(){
 			tTriangle.setStyle(this.strokeStyle, this.fillStyle, this.lineWidth);
 			shapeArray.push(tTriangle);
 		}
-		m_move_draw_objects(ctx, shapeArray);
 	}
 	this.drawMove=function(ctx, x, y){
-		if(this.whichShape == 'triangle'){
+		ctx.lineWidth = this.lineWidth;
+		ctx.strokeStyle = this.strokeStyle;
+		ctx.fillStyle = this.fillStyle;
+		if(this.whichShape=='line'){
+			// draw temp line
 			return;
-		}else{
-			return;
+		} else if (this.whichShape=='square'){
+			// draw temp square
+			draw_square(x, y, x + this.squareDelta[0], y + this.squareDelta[1]);
+		} else {
+			// it is a temp triangle to be drawn
+			
+			draw_triangle(x, y, 
+							  x + this.triangleDelta[0][0], y + this.triangleDelta[0][1],
+							  x + this.triangleDelta[1][0], y + this.triangleDelta[1][1]);
+			
+			
 		}
 	}
 }
@@ -239,7 +252,6 @@ function Line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 		ctx.beginPath();
 		ctx.moveTo(this.lineStartX, this.lineStartY);
 		ctx.lineTo(this.lineFinishX, this.lineFinishY);
-		//ctx.fill();
 		ctx.stroke();
 		resetCtx(ctx)
 	}
@@ -250,7 +262,7 @@ function Line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 		return 'line';
 	}
 }
-function m_down_draw_objects(ctx, cur_select, copyObject, shapeArray, curX, curY, fillStyle, strokeStyle, lineWidth, scalingFactor){
+function m_down_draw_objects(ctx, cur_select, copyObject, moveObject, shapeArray, isMoving, curX, curY, fillStyle, strokeStyle, lineWidth, scalingFactor){
 	erase_canvas(true, shapeArray);
 	topZ = -1;
 	if(shapeArray !== 'undefined'){
@@ -269,14 +281,33 @@ function m_down_draw_objects(ctx, cur_select, copyObject, shapeArray, curX, curY
 				m_move_draw_objects(ctx, shapeArray);
 			}
 			// move
-
+			else if(cur_select == 'move'){
+				console.log("just started the move operation");
+				shapeType = shapeArray[topZ].shapeType();
+				moveObject.setSelection(shapeType);
+				moveObject.setStyle(shapeArray[topZ].getStyle());
+				isMoving = true;
+				moveObject.moving = true;
+				if(shapeType == 'square'){
+					console.log('about to copy square delta');
+					moveObject.setSquareDelta(shapeArray[topZ].getDelta());
+					console.log('logged delta', isMoving);
+					return;
+				}else if(shapeType == 'line'){
+					return;
+				}else{
+					//triangle
+					moveObject.setTriangleDelta(shapeArray[topZ].getDelta());
+					return;
+				}
+			}
 			// resize
-			if(cur_select == 'resize'){
+			else if(cur_select == 'resize'){
 				shapeArray[topZ].resize(scalingFactor);
 			}
 
 			//change attributes
-			if(cur_select == 'change'){
+			else if(cur_select == 'change'){
 				shapeArray[topZ].setStyle(strokeStyle, fillStyle, lineWidth);
 				m_move_draw_objects(ctx, shapeArray);
 			}
@@ -305,8 +336,6 @@ function m_down_draw_objects(ctx, cur_select, copyObject, shapeArray, curX, curY
 		} else if(cur_select == 'paste'){
 			copyObject.createCopy(ctx, shapeArray, curX, curY);
 			m_move_draw_objects(ctx, shapeArray);
-		}else{
-				document.getElementById('myCanvas').style.cursor='crosshair';
 		}
 	}
 
@@ -397,6 +426,9 @@ $(document).ready(function() {
 	var drawingObject = false;
 	var copyThisObject = null;
 	var copyObject = new CopyInfo;
+	var moveObject = new CopyInfo;
+	var isMoving = false;
+
 	// User clicks mouse down to denote where to star their shape
 	$('#myCanvas').mousedown(function(e) {
 		fillStyle = document.getElementById('fill-color').value;
@@ -425,7 +457,7 @@ $(document).ready(function() {
 				drawingObject = true;
 			}
 		}else{
-			m_down_draw_objects(ctx, cur_select, copyObject, shapeArray, curX, curY, fillStyle, strokeStyle, lineWidth, scalingFactor);
+			m_down_draw_objects(ctx, cur_select, copyObject, moveObject, shapeArray, isMoving, curX, curY, fillStyle, strokeStyle, lineWidth, scalingFactor);
 		}
 		m_move_draw_objects(ctx, shapeArray, curX, curY);
 		
@@ -434,6 +466,10 @@ $(document).ready(function() {
 	$(document).mousemove(function(event){
 			// object is being drawn
 			// update the screen
+
+			if(moveObject.moving == true){
+				moveObject.drawMove(ctx, curX, curY);
+			}
 			curX = event.clientX;
 			curY = event.clientY - yoffset;
 			m_move_draw_objects(ctx, shapeArray, curX, curY);
@@ -449,6 +485,14 @@ $(document).ready(function() {
 
 	// User lifts mouse up to denote where to finish their shape
 	$('#myCanvas').mouseup(function(e){
+		if(moveObject.moving){
+			moveObject.createCopy(ctx, shapeArray, e.clientX, e.clientY - yoffset);
+			console.log("stopped moving");
+		}
+		moveObject.moving = false;
+		
+		isMoving = false;
+
 		fillStyle = document.getElementById('fill-color').value;
 		strokeStyle = document.getElementById('stroke-color').value;
 		lineWidth = document.getElementById('line-width').value;
