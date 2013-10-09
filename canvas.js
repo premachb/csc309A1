@@ -42,7 +42,6 @@ function draw_square(startX, startY, finishX, finishY){
 		}
 		
 	}
-	//ctx.strokeRect(startX, startY, width, height);
 
 }
 function CopyInfo(){
@@ -88,6 +87,13 @@ function CopyInfo(){
 			shapeArray.push(tTriangle);
 		}
 		m_move_draw_objects(ctx, shapeArray);
+	}
+	this.drawMove=function(ctx, x, y){
+		if(this.whichShape == 'triangle'){
+			return;
+		}else{
+			return;
+		}
 	}
 }
 function Square(startX, startY, finishX, finishY){
@@ -139,6 +145,10 @@ function Square(startX, startY, finishX, finishY){
 	}
 	this.shapeType=function(){
 		return 'square';
+	}
+	this.resize=function(scalingFactor){
+		this.height = this.height * scalingFactor;
+		this.width = this.width * scalingFactor;
 	}
 }
 function Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineFinishY){
@@ -232,7 +242,7 @@ function Line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 		return 'line';
 	}
 }
-function m_down_draw_objects(ctx, cur_select, copyObject, shapeArray, curX, curY, fillStyle, strokeStyle, lineWidth){
+function m_down_draw_objects(ctx, cur_select, copyObject, shapeArray, curX, curY, fillStyle, strokeStyle, lineWidth, scalingFactor){
 	erase_canvas(true, shapeArray);
 	topZ = -1;
 	if(shapeArray !== 'undefined'){
@@ -253,6 +263,9 @@ function m_down_draw_objects(ctx, cur_select, copyObject, shapeArray, curX, curY
 			// move
 
 			// resize
+			if(cur_select == 'resize'){
+				shapeArray[topZ].resize(scalingFactor);
+			}
 
 			//change attributes
 			if(cur_select == 'change'){
@@ -297,12 +310,10 @@ function m_move_draw_objects(ctx, shapeArray, curX, curY){
 	if(shapeArray !== 'undefined'){
 		var arrLength = shapeArray.length;
 		for(var index = 0; index < arrLength; index++){
-			
 			shapeArray[index].draw(ctx);
 			if(ctx.isPointInPath(curX, curY)){
 				// change cursor icon
 				hover = true;
-				//document.getElementById('myCanvas').style.cursor='pointer';
 			}
 		}
 	}
@@ -373,6 +384,7 @@ $(document).ready(function() {
 	var fillStyle = document.getElementById('fill-color').value;
 	var strokeStyle = document.getElementById('stroke-color').value;
 	var lineWidth = document.getElementById('line-width').value;
+	var scalingFactor = document.getElementById('rescale-factor').value;
 	var triangleValidMid=false;
 	var drawingObject = false;
 	var copyThisObject = null;
@@ -382,6 +394,7 @@ $(document).ready(function() {
 		fillStyle = document.getElementById('fill-color').value;
 		strokeStyle = document.getElementById('stroke-color').value;
 		lineWidth = document.getElementById('line-width').value;
+		scalingFactor = document.getElementById('rescale-factor').value;
 		if(cur_select == 'line'){
 			lineStartX = e.clientX;
 			lineStartY = e.clientY - yoffset;
@@ -404,7 +417,7 @@ $(document).ready(function() {
 				drawingObject = true;
 			}
 		}else{
-			m_down_draw_objects(ctx, cur_select, copyObject, shapeArray, curX, curY, fillStyle, strokeStyle, lineWidth);
+			m_down_draw_objects(ctx, cur_select, copyObject, shapeArray, curX, curY, fillStyle, strokeStyle, lineWidth, scalingFactor);
 		}
 		m_move_draw_objects(ctx, shapeArray, curX, curY);
 		
