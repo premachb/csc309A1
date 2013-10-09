@@ -160,23 +160,38 @@ function Line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 		resetCtx(ctx)
 	}
 }
-function m_down_draw_objects(ctx, cur_select, shapeArray, curX, curY){
+function m_down_draw_objects(ctx, cur_select, shapeArray, curX, curY, fillStyle, strokeStyle, lineWidth){
 	erase_canvas(true, shapeArray);
+	topZ = -1;
 	if(shapeArray !== 'undefined'){
 		var arrLength = shapeArray.length;
 		for(var index = 0; index < arrLength; index++){
 			shapeArray[index].draw(ctx);
 			if(ctx.isPointInPath(curX, curY)){
 				// keeping track of the object with greatest Z index will have largest i index
-				relevantIndex = index;
+				topZ = index;
 				console.log("point on path");
 			}
 		}
-		if(cur_select == 'erase'){
-			shapeArray.splice(relevantIndex,1);
-			m_move_draw_objects(ctx, shapeArray);
+		if(topZ > -1){
+			if(cur_select == 'erase'){
+				shapeArray.splice(topZ,1);
+				m_move_draw_objects(ctx, shapeArray);
+			}
+			// move
+
+			// resize
+
+			//change attributes
+			if(cur_select == 'change'){
+				shapeArray[topZ].setStyle(strokeStyle, fillStyle, lineWidth);
+				m_move_draw_objects(ctx, shapeArray);
+			}
+
+			//copy
+
+			//paste
 		}
-		
 	}
 
 }
@@ -187,10 +202,6 @@ function m_move_draw_objects(ctx, shapeArray){
 		for(var index = 0; index < arrLength; index++){
 			shapeArray[index].draw(ctx);
 			if(ctx.isPointInPath(curX, curY)){
-				// if(cur_select == 'erase'){
-				// 	erase(shapeArray, index, curX, curY);
-				// 	return 1;
-				// }
 				console.log("point on path");
 			}
 		}
@@ -260,6 +271,9 @@ $(document).ready(function() {
 	var drawingObject = false;
 	// User clicks mouse down to denote where to star their shape
 	$('#myCanvas').mousedown(function(e) {
+		fillStyle = document.getElementById('fill-color').value;
+		strokeStyle = document.getElementById('stroke-color').value;
+		lineWidth = document.getElementById('line-width').value;
 		if(cur_select == 'line'){
 			lineStartX = e.clientX;
 			lineStartY = e.clientY - yoffset;
@@ -283,7 +297,7 @@ $(document).ready(function() {
 				drawingObject = true;
 			}
 		}else{
-			m_down_draw_objects(ctx, cur_select, shapeArray, curX, curY);
+			m_down_draw_objects(ctx, cur_select, shapeArray, curX, curY, fillStyle, strokeStyle, lineWidth);
 		}
 		m_move_draw_objects(ctx, shapeArray);
 		
