@@ -195,6 +195,14 @@ function Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineF
 	this.shapeType=function(){
 		return 'triangle';
 	}
+	this.resize=function(scalingFactor){
+		curDelta = this.getDelta();
+		this.lineMidX = this.lineStartX + (scalingFactor * (curDelta[0][0]));
+		this.lineMidY = this.lineStartY + (scalingFactor * (curDelta[0][1]));
+		this.lineFinishX = this.lineStartX + (scalingFactor * (curDelta[1][0]));
+		this.lineFinishY = this.lineStartY + (scalingFactor * (curDelta[1][1]));
+		
+	}
 
 
 }
