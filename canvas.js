@@ -297,11 +297,13 @@ function m_move_draw_objects(ctx, shapeArray, curX, curY){
 	if(shapeArray !== 'undefined'){
 		var arrLength = shapeArray.length;
 		for(var index = 0; index < arrLength; index++){
+			
+			shapeArray[index].draw(ctx);
 			if(ctx.isPointInPath(curX, curY)){
 				// change cursor icon
 				hover = true;
+				//document.getElementById('myCanvas').style.cursor='pointer';
 			}
-			shapeArray[index].draw(ctx);
 		}
 	}
 	if(hover){
@@ -458,7 +460,7 @@ $(document).ready(function() {
 				lineMidY = lineFinishY;
 			}
 		}
-		m_move_draw_objects(ctx, shapeArray, lineFinishX, lineFinishY);
+		m_move_draw_objects(ctx, shapeArray);
 	});
 
 	$("button").click(function(){ cur_select = $(this).attr('id'); selector(cur_select, button_descriptions, shapeArray)});
