@@ -53,14 +53,14 @@ function CopyInfo(){
 	this.lineWidth = 1;
 	this.strokeStyle = '#000000';
 	this.fillStlye = '#000000';
-	this.setSquareDelta=function(dataArr){
-		this.squareDelta = dataArr;
+	this.setSquareDelta=function(sArr){
+		this.squareDelta = sArr;
 	}
-	this.setLineDelta = function(x, y){
-		this.lineDelta = [x, y];
+	this.setLineDelta = function(lArr){
+		this.lineDelta = lArr;
 	}
-	this.setTriangleDelta = function(midDelta, endDelta){
-		this.triangleDelta = [midDelta, endDelta];
+	this.setTriangleDelta = function(tArr){
+		this.triangleDelta = tArr;
 	}
 	this.setSelection=function(shapeType){
 		this.whichShape = shapeType;
@@ -72,18 +72,22 @@ function CopyInfo(){
 	}
 	this.createCopy=function(ctx, shapeArray, x, y){
 		if(this.whichShape == 'square'){
-			console.log(this.squareDelta);
-			var tSquare = new Square(x, y, x + this.squareDelta[1], y + this.squareDelta[0]);
+			var tSquare = new Square(x, y, x + this.squareDelta[0], y + this.squareDelta[1]);
 			tSquare.setStyle(this.strokeStyle, this.fillStyle, this.lineWidth);
 			shapeArray.push(tSquare);
-			m_move_draw_objects(ctx, shapeArray);
-
-			return;
 		}else if(this.whichShape == 'line'){
-			return;
+			var tLine = new Line(x, y, x + lineDelta[0], y + lineDelta[1]);
+			tLine.setStyle(this.strokeStyle, this.fillStyle, this.lineWidth);
+			shapeArray.push(tLine);
+
 		}else if(this.whichShape == 'triangle'){
-			return;
+			var tTriangle = new Triangle(x, y, 
+										 x + this.triangleDelta[0][0], y + this.triangleDelta[0][1],
+										 x + this.triangleDelta[1][0], y + this.triangleDelta[1][1]);
+			tTriangle.setStyle(this.strokeStyle, this.fillStyle, this.lineWidth);
+			shapeArray.push(tTriangle);
 		}
+		m_move_draw_objects(ctx, shapeArray);
 	}
 }
 function Square(startX, startY, finishX, finishY){
@@ -131,7 +135,7 @@ function Square(startX, startY, finishX, finishY){
 		resetCtx(ctx)
 	}
 	this.getDelta=function(){
-		return [this.height, this.width];
+		return [this.width, this.height];
 	}
 	this.shapeType=function(){
 		return 'square';
@@ -152,6 +156,9 @@ function Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineF
 		this.strokeStyle = strokeStyle;
 		this.fillStyle = fillStyle;
 	}
+	this.getStyle=function(){
+		return [this.strokeStyle, this.fillStyle, this.lineWidth];
+	}
 	this.updateMid=function(newX, newY){
 		this.lineMidX = newX;
 		this.lineMidY = newY;
@@ -169,7 +176,12 @@ function Triangle(lineStartX, lineStartY, lineMidX, lineMidY, lineFinishX, lineF
 		ctx.stroke();
 		resetCtx(ctx)
 	}
-
+	this.getDelta=function(){
+		return[
+			[this.lineMidX - this.lineStartX, this.lineMidY - this.lineStartY],
+			[this.lineFinishX - this.lineStartX, this.lineFinishY - this.lineStartY]
+		];
+	}
 	this.shapeType=function(){
 		return 'triangle';
 	}
@@ -213,7 +225,9 @@ function Line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 		ctx.stroke();
 		resetCtx(ctx)
 	}
-
+	this.getDelta=function(){
+		return [this.lineFinishX - this.lineStartX, this.lineFinishY - this.lineStartY];
+	}
 	this.shapeType=function(){
 		return 'line';
 	}
@@ -251,13 +265,13 @@ function m_down_draw_objects(ctx, cur_select, copyObject, shapeArray, curX, curY
 				copyObject.setSelection(shapeType);
 				copyObject.setStyle(shapeArray[topZ].getStyle());
 				if(shapeType == 'square'){
-					console.log("copied a square");
 					copyObject.setSquareDelta(shapeArray[topZ].getDelta());
 					return;
 				}else if(shapeType == 'line'){
 					return;
 				}else{
 					//triangle
+					copyObject.setTriangleDelta(shapeArray[topZ].getDelta());
 					return;
 				}
 
@@ -275,7 +289,6 @@ function m_down_draw_objects(ctx, cur_select, copyObject, shapeArray, curX, curY
 			}
 
 		} else if(cur_select == 'paste'){
-			console.log("out here");
 			copyObject.createCopy(ctx, shapeArray, curX, curY);
 			m_move_draw_objects(ctx, shapeArray);
 		}
