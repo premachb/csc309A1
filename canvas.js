@@ -160,18 +160,37 @@ function Line(lineStartX, lineFinishX, lineStartY, lineFinishY){
 		resetCtx(ctx)
 	}
 }
-
-function draw_objects(ctx, cur_select, shapeArray, curX, curY){
+function m_down_draw_objects(ctx, cur_select, shapeArray, curX, curY){
 	erase_canvas(true, shapeArray);
 	if(shapeArray !== 'undefined'){
 		var arrLength = shapeArray.length;
 		for(var index = 0; index < arrLength; index++){
 			shapeArray[index].draw(ctx);
 			if(ctx.isPointInPath(curX, curY)){
-				if(cur_select == 'erase'){
-					erase(shapeArray, index, curX, curY);
-					return 1;
-				}
+				// keeping track of the object with greatest Z index will have largest i index
+				relevantIndex = index;
+				console.log("point on path");
+			}
+		}
+		if(cur_select == 'erase'){
+			shapeArray.splice(relevantIndex,1);
+			m_move_draw_objects(ctx, shapeArray);
+		}
+		
+	}
+
+}
+function m_move_draw_objects(ctx, shapeArray){
+	erase_canvas(true, shapeArray);
+	if(shapeArray !== 'undefined'){
+		var arrLength = shapeArray.length;
+		for(var index = 0; index < arrLength; index++){
+			shapeArray[index].draw(ctx);
+			if(ctx.isPointInPath(curX, curY)){
+				// if(cur_select == 'erase'){
+				// 	erase(shapeArray, index, curX, curY);
+				// 	return 1;
+				// }
 				console.log("point on path");
 			}
 		}
@@ -215,6 +234,7 @@ function erase_canvas(internal, shapeArray){
 // TODO create a Shape object in which 
 
 $(document).ready(function() {
+	document.getElementById('myCanvas').style.cursor='pointer';
 	var ctx = $('#myCanvas')[0].getContext('2d');
 	var shapeArray = new Array(); // keep track of the objects currently on the canvas.
 	var button_descriptions = { // Could maybe move this to CSS and then call that ways
@@ -240,7 +260,6 @@ $(document).ready(function() {
 	var drawingObject = false;
 	// User clicks mouse down to denote where to star their shape
 	$('#myCanvas').mousedown(function(e) {
-
 		if(cur_select == 'line'){
 			lineStartX = e.clientX;
 			lineStartY = e.clientY - yoffset;
@@ -263,7 +282,11 @@ $(document).ready(function() {
 				lineStartY = e.clientY - yoffset;
 				drawingObject = true;
 			}
+		}else{
+			m_down_draw_objects(ctx, cur_select, shapeArray, curX, curY);
 		}
+		m_move_draw_objects(ctx, shapeArray);
+		
 	});
 
 	//this is where the drawing occurs
@@ -272,7 +295,7 @@ $(document).ready(function() {
 			// update the screen
 			curX = event.clientX;
 			curY = event.clientY - yoffset;
-			while( 1 == draw_objects(ctx, cur_select, shapeArray, curX, curY)){
+			while( 1 == m_move_draw_objects(ctx, shapeArray)){
 			}
 			if(drawingObject){
 				if(triangleValidMid){
@@ -323,7 +346,7 @@ $(document).ready(function() {
 		else { 
 			console.log("not line action");
 		}
-		draw_objects(ctx, cur_select, shapeArray, e.clientX, e.clientY - yoffset);
+		m_move_draw_objects(ctx, shapeArray);
 	});
 
 	$("button").click(function(){ cur_select = $(this).attr('id'); selector(cur_select, button_descriptions, shapeArray)});
