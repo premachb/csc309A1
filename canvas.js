@@ -89,6 +89,7 @@ function CopyInfo(){
 		}
 	}
 	this.drawMove=function(ctx, x, y){
+		console.log(this.lineWidth, this.strokeStyle, this.fillStyle);
 		ctx.lineWidth = this.lineWidth;
 		ctx.strokeStyle = this.strokeStyle;
 		ctx.fillStyle = this.fillStyle;
@@ -292,6 +293,7 @@ function m_down_draw_objects(ctx, cur_select, copyObject, moveObject, shapeArray
 					console.log('about to copy square delta');
 					moveObject.setSquareDelta(shapeArray[topZ].getDelta());
 					console.log('logged delta', isMoving);
+					shapeArray.splice(topZ,1);
 					return;
 				}else if(shapeType == 'line'){
 					return;
