@@ -455,32 +455,21 @@ $(document).ready(function() {
 		strokeStyle = document.getElementById('stroke-color').value;
 		lineWidth = document.getElementById('line-width').value;
 		scalingFactor = document.getElementById('rescale-factor').value;
-		if(curSelect == 'line') {
-			lineStartX = e.clientX;
-			lineStartY = e.clientY - yoffset;
+		curX = e.clientX;
+		curY = e.clientY - yoffset;
+		if((curSelect == 'line') | (curSelect == 'square') | (curSelect == 'triangle')){
 			drawingObject = true;
-		}
-		else if(curSelect == 'square') {
-			lineStartX = e.clientX;
-			lineStartY = e.clientY - yoffset;
-			drawingObject = true;
-		} 
-		else if (curSelect == 'triangle') {
-			if (triangleValidMid) {
-				//tempTriangle.updateMid(e.clientX, e.clientY - yoffset);
-				lineMidX = e.clientX;
-				lineMidY = e.clientY - yoffset;
-				triangleValidMid = true;
+			if(triangleValidMid){
+				lineMidX = curX;
+				lineMidY = curY;
 			} else{
-				lineStartX = e.clientX;
-				lineStartY = e.clientY - yoffset;
-				drawingObject = true;
+				lineStartX = curX;
+				lineStartY = curY;
 			}
-		}else{
+			mMoveDrawObjects(ctx, shapeArray, curX, curY);
+		} else {
 			mDownDrawObjects(ctx, curSelect, copyObject, moveObject, shapeArray,curX, curY, fillStyle, strokeStyle, lineWidth, scalingFactor);
 		}
-		mMoveDrawObjects(ctx, shapeArray, curX, curY);
-		
 	});
 
 	$(document).mousemove(function(event) {
