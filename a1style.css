@@ -1,4 +1,4 @@
-article{
+article, header{
 	margin-left: 10px;
 }
 
@@ -6,7 +6,7 @@ article{
     border:1px solid #000000;
 }
 
-#myCanvas, #cur_fill_color{
+#myCanvas, #cur_fill_color, #current_action, #shape_action{
     margin-top: 10px;
 }
 
