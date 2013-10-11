@@ -9,6 +9,7 @@ function selector(curSelect, button_descriptions, shapeArray) {
 // following functions are used to draw the "preview" shape for when the user has the mouse depressed
 // and has selected one of the three draw object options
 function drawTemp(ctx, curSelect, lineStartX, lineStartY, lineMidX, lineMidY, curX, curY) {
+	console.log("about to draw", lineStartX, lineStartY, curX, curY);
 	if(curSelect=='line') {
 		// draw temp line
 		drawLine(lineStartX, lineStartY, curX, curY);
@@ -75,6 +76,7 @@ function CopyInfo() {
 	this.lineWidth = 1;
 	this.strokeStyle = '#000000';
 	this.fillStlye = '#000000';
+	this.moveOffset  = [0,0];
 	this.setSquareDelta=function(sArr) {
 		this.squareDelta = sArr;
 	}
@@ -94,7 +96,8 @@ function CopyInfo() {
 	}
 	this.createCopy=function(ctx, shapeArray, x, y) {
 		if(this.whichShape == 'square') {
-			var tSquare = new Square(x, y, x + this.squareDelta[0], y + this.squareDelta[1]);
+			var tSquare = new Square(x - this.moveOffset[0], y - this.moveOffset[1], 
+								     x + this.squareDelta[0] - this.moveOffset[0], y + this.squareDelta[1] - this.moveOffset[1]);
 			tSquare.setStyle(this.strokeStyle, this.fillStyle, this.lineWidth);
 			shapeArray.push(tSquare);
 		}else if(this.whichShape == 'line') {
@@ -103,29 +106,27 @@ function CopyInfo() {
 			shapeArray.push(tLine);
 
 		}else if(this.whichShape == 'triangle') {
-			var tTriangle = new Triangle(x, y, 
+			var tTriangle = new Triangle(x - this.moveOffset[0], y - this.moveOffset[1], 
 										 x + this.triangleDelta[0][0], y + this.triangleDelta[0][1],
 										 x + this.triangleDelta[1][0], y + this.triangleDelta[1][1]);
 			tTriangle.setStyle(this.strokeStyle, this.fillStyle, this.lineWidth);
 			shapeArray.push(tTriangle);
 		}
 	}
-	this.drawMove=function(ctx, x, y) {
-		ctx.lineWidth = this.lineWidth;
-		ctx.strokeStyle = this.strokeStyle;
-		ctx.fillStyle = this.fillStyle;
+	this.drawMove=function(ctx, x1, y1) {
 		if(this.whichShape=='line') {
 			// draw temp line
 			return;
 		} else if (this.whichShape=='square') {
 			// draw temp square
-			drawSquare(x, y, x + this.squareDelta[0], y + this.squareDelta[1]);
+			//drawSquare(x, y, x + this.squareDelta[0], y + this.squareDelta[1]);
+			drawTemp(ctx, 'square', x1, y1, 0, 0, x1 + this.squareDelta[0], y1 + this.squareDelta[1]);
 		} else {
 			// it is a temp triangle to be drawn
 			
-			drawTriangle(x, y, 
-							  x + this.triangleDelta[0][0], y + this.triangleDelta[0][1],
-							  x + this.triangleDelta[1][0], y + this.triangleDelta[1][1]);
+			drawTriangle(x1, y1, 
+							  x1 + this.triangleDelta[0][0], y1 + this.triangleDelta[0][1],
+							  x1 + this.triangleDelta[1][0], y1 + this.triangleDelta[1][1]);
 			
 			
 		}
@@ -308,8 +309,11 @@ function mDownDrawObjects(ctx, curSelect, copyObject, moveObject, shapeArray, cu
 				shapeType = shapeArray[topZ].shapeType();
 				moveObject.setSelection(shapeType);
 				moveObject.setStyle(shapeArray[topZ].getStyle());
+
 				moveObject.moving = true;
 				if(shapeType == 'square') {
+					console.log(curX - shapeArray[topZ].x, curY - shapeArray[topZ].y);
+					moveObject.moveOffset = [curX - shapeArray[topZ].x, curY - shapeArray[topZ].y];
 					moveObject.setSquareDelta(shapeArray[topZ].getDelta());
 					shapeArray.splice(topZ,1);
 					return;
@@ -317,6 +321,7 @@ function mDownDrawObjects(ctx, curSelect, copyObject, moveObject, shapeArray, cu
 					return;
 				}else{
 					//triangle
+					console.log(shapeArray[topZ].lineStartX);
 					moveObject.setTriangleDelta(shapeArray[topZ].getDelta());
 					shapeArray.splice(topZ,1);
 					return;
@@ -349,12 +354,9 @@ function mDownDrawObjects(ctx, curSelect, copyObject, moveObject, shapeArray, cu
 					return;
 				}
 			}
-			else if(curSelect == 'paste') {
-				copyObject.createCopy(ctx, shapeArray, curX, curY);
-				mMoveDrawObjects(ctx, shapeArray);
-			}
 
-		} else if(curSelect == 'paste') {
+		}
+		if(curSelect == 'paste') {
 			copyObject.createCopy(ctx, shapeArray, curX, curY);
 			mMoveDrawObjects(ctx, shapeArray);
 		}
@@ -469,41 +471,38 @@ $(document).ready(function() {
 			mMoveDrawObjects(ctx, shapeArray, curX, curY);
 		} else {
 			mDownDrawObjects(ctx, curSelect, copyObject, moveObject, shapeArray,curX, curY, fillStyle, strokeStyle, lineWidth, scalingFactor);
-		}
+		}3
 	});
 
 	$(document).mousemove(function(event) {
-			// object is being drawn
-			// update the screen
-
-			if(moveObject.moving == true) {
-				moveObject.drawMove(ctx, curX, curY);
-			}
 			curX = event.clientX;
 			curY = event.clientY - yoffset;
-			mMoveDrawObjects(ctx, shapeArray, curX, curY);
-			if(drawingObject) {
-				if(triangleValidMid) {
-					drawTemp(ctx, curSelect, lineStartX, lineStartY, lineMidX, lineMidY, curX, curY)
-				} else{
-					drawTemp(ctx, curSelect, lineStartX, lineStartY, lineStartX, lineStartY, curX, curY);
+			
+			if(moveObject.moving == true) {
+				moveObject.drawMove(drawTemp, ctx, curX, curY);
+			} else {
+				mMoveDrawObjects(ctx, shapeArray, curX, curY);
+				if(drawingObject) {
+					// drawing the outline after all other objects will give it the highest z-index
+					if(triangleValidMid) {
+						drawTemp(ctx, curSelect, lineStartX, lineStartY, lineMidX, lineMidY, curX, curY)
+					} else{
+						drawTemp(ctx, curSelect, lineStartX, lineStartY, lineStartX, lineStartY, curX, curY);
+					}
 				}
 			}
-		
   	});
 
 	// User lifts mouse up to denote where to finish their shape
 	$('#myCanvas').mouseup(function(e) {
 		if(moveObject.moving) {
-			moveObject.createCopy(ctx, shapeArray, e.clientX, e.clientY - yoffset);
+			moveObject.createCopy(ctx, shapeArray, curX, curY);
 		}
 		moveObject.moving = false;
-		
-
 		fillStyle = document.getElementById('fill-color').value;
 		strokeStyle = document.getElementById('stroke-color').value;
 		lineWidth = document.getElementById('line-width').value;
-		var ctx = $('#myCanvas')[0].getContext('2d');
+		//var ctx = $('#myCanvas')[0].getContext('2d');
 		lineFinishX = e.clientX;
 		lineFinishY = e.clientY - yoffset;
 
