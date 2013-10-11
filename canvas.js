@@ -427,7 +427,7 @@ $(document).ready(function() {
     var copyArray = new Array();
     var button_descriptions = { // Could maybe move this to CSS and then call that ways
         "line" : "Line tool: Click on a starting point and drag to ending point",
-        "triangle" : "insert instructions",
+        "triangle" : "Triangle Tool: Click on a starting point and drag to create the base, click again and drag to complete the triangle",
         "square" : "Click on top left corner of your desired square and then drag to bottom right corner",
         "erase" : "Click on the object you wish to erase. This action cannot be undone",
         "move" : "Click on an object you would like to move and drag it to its new position",
