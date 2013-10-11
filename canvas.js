@@ -438,7 +438,7 @@ $(document).ready(function() {
         "clear" : "Remove all objects off the canvas. THIS ACTION CANNOT BE UNDONE"
     };
 
-    var yoffset = document.getElementById('shape_selector').offsetHeight + document.getElementById('shape_action').offsetHeight + 30;
+    var yoffset = document.getElementById('title').offsetHeight + document.getElementById('shape_selector').offsetHeight + document.getElementById('shape_action').offsetHeight + 60;
     var xoffset = 10;
     var lineFinishX, lineFinishY, lineStartX, lineStartY, lineMidX, lineMidY;
     var curSelect = "none";
