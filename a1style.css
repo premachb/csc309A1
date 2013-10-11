@@ -1,0 +1,15 @@
+article{
+	margin-left: 10px;
+}
+
+#myCanvas{
+    border:1px solid #000000;
+}
+
+#myCanvas, #cur_fill_color{
+    margin-top: 10px;
+}
+
+#fill_color, #stroke_color, #line-width, #rescale-factor{
+    margin: 5px;
+}
