@@ -1,3 +1,6 @@
+// Created By Zach Munro-cape and Brien Premachandiran
+// g2premac, g2zach
+
 function selector(curSelect, button_descriptions, shapeArray) {
     // Update the on-screen action selection
     document.getElementById("current_action").innerHTML=button_descriptions[curSelect];
