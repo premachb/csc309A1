@@ -438,7 +438,7 @@ $(document).ready(function() {
         "clear" : "Remove all objects off the canvas. THIS ACTION CANNOT BE UNDONE"
     };
 
-    var yoffset = document.getElementById('title').offsetHeight + document.getElementById('shape_selector').offsetHeight + document.getElementById('shape_action').offsetHeight;
+    var yoffset = document.getElementById('shape_selector').offsetHeight + document.getElementById('shape_action').offsetHeight + 30;
     var xoffset = 10;
     var lineFinishX, lineFinishY, lineStartX, lineStartY, lineMidX, lineMidY;
     var curSelect = "none";
@@ -459,7 +459,7 @@ $(document).ready(function() {
         lineWidth = document.getElementById('line-width').value;
         scalingFactor = document.getElementById('rescale-factor').value;
         curX = e.clientX - xoffset;
-        curY = e.clientY - yoffset;
+        curY = e.clientY - yoffset + $(window).scrollTop();
         if((curSelect == 'line') | (curSelect == 'square') | (curSelect == 'triangle')){
             drawingObject = true;
             if(triangleValidMid){
@@ -477,7 +477,7 @@ $(document).ready(function() {
 
     $(document).mousemove(function(event) {
         curX = event.clientX - xoffset;
-        curY = event.clientY - yoffset;
+        curY = event.clientY - yoffset + $(window).scrollTop();
 
         if(moveObject.moving == true) {
             moveObject.drawMove(drawTemp, ctx, curX, curY);
@@ -505,7 +505,7 @@ $(document).ready(function() {
         lineWidth = document.getElementById('line-width').value;
         //var ctx = $('#myCanvas')[0].getContext('2d');
         lineFinishX = e.clientX - xoffset;
-        lineFinishY = e.clientY - yoffset;
+        lineFinishY = e.clientY - yoffset + $(window).scrollTop();
 
         if(curSelect == 'line') {
             var tempLine = new Line(lineStartX, lineFinishX, lineStartY, lineFinishY);
